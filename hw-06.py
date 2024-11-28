@@ -15,7 +15,7 @@ class Name(Field):
 
 # Клас для зберігання номера телефону. Має валідацію формату (10 цифр)
 class Phone(Field):
-    # рНаслідує клас Field. Значення зберігaється в полі value.
+    # Наслідує клас Field. Значення зберігaється в полі value.
     def __init__(self, phone_number):
         self.value = None
         self.set_phone_number(phone_number)
@@ -56,8 +56,7 @@ class Record(Name, Phone):
     def remove_phone(self, phone_number):
         for phone in self.phones:
             if phone.value == phone_number:
-                self.phones.remove(phone)
-                print(f"Number {phone_number} deleted successfully.")
+                self.phones.remove(phone)                
    
     '''Реалізовано метод для редагування - edit_phone. 
        На вхід подається два аргумента - рядки, які містять старий номер телефона та новий. 
@@ -65,8 +64,9 @@ class Record(Name, Phone):
     def edit_phone(self, old_phone_number, new_phone_number):
         for phone in self.phones:
             if phone.value == old_phone_number:
-                phone.value = new_phone_number
-                print(f"Number {old_phone_number} changed to {new_phone_number}.")
+                phone.set_phone_number(new_phone_number)
+                return
+        raise ValueError(f"Номер {old_phone_number} не знайдено.")
 
     ''' Реалізовано метод для пошуку об'єктів Phone - find_phone.
         На вхід подається рядок, який містить номер телефона. 
@@ -96,6 +96,8 @@ class AddressBook(UserDict):
         Записи Record у AddressBook зберігаються як значення у словнику. 
         В якості ключів використовується значення Record.name.value.'''
     def add_record(self, record):
+        if record.name.value in self.data:
+            raise ValueError(f"Запис з ім'ям {record.name.value} вже існує.")
         self.data[record.name.value] = record
 
     '''Реалізовано метод find, який знаходить запис за ім'ям. 
@@ -107,15 +109,11 @@ class AddressBook(UserDict):
     '''Реалізовано метод delete, який видаляє запис за ім'ям.'''       
     def delete(self, name):        
         if name in self.data:
-            del self.data[name]
-            print(f"Запис з ім'ям {name} видалено.")
-        else:
-            print(f"Запис з ім'ям {name} не знайдено.") 
+            del self.data[name]             
 
     '''Реалізовано магічний метод __str__ для красивого виводу об’єкту класу AddressBook.'''
     def __str__(self):
-        result = []
-        print("Адресна книга:")
+        result = []        
         for record in self.data.values():
             result.append(str(record))
         return "\n".join(result) 
@@ -137,7 +135,8 @@ if __name__ == "__main__":
     jane_record.add_phone("9876543210")
     book.add_record(jane_record)
 
-    # Виведення всіх записів у книзі     
+    # Виведення всіх записів у книзі 
+    print("Адресна книга:")    
     print(book)
 
     # Знаходження та редагування телефону для John
@@ -152,5 +151,5 @@ if __name__ == "__main__":
 
     # Видалення запису Jane
     book.delete("Jane")
-
+    print("Адресна книга:")
     print(book)
